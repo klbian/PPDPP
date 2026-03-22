@@ -1,0 +1,87 @@
+{
+  "slm_threshold": 0.35,
+  "llm_threshold": 0.4,
+  "metrics": {
+    "llm": {
+      "prediction_count": 2083,
+      "true_positive": 649,
+      "precision": 0.3115698511761882,
+      "recall": 0.03719624025676295,
+      "f1": 0.06645845066816855
+    },
+    "slm": {
+      "prediction_count": 13554,
+      "true_positive": 12099,
+      "precision": 0.8926516157591855,
+      "recall": 0.6934319119669876,
+      "f1": 0.7805302883684924
+    },
+    "union": {
+      "prediction_count": 15071,
+      "true_positive": 12212,
+      "precision": 0.8102979231636919,
+      "recall": 0.6999082989454378,
+      "f1": 0.7510686060456964
+    },
+    "fused": {
+      "prediction_count": 13489,
+      "true_positive": 12126,
+      "precision": 0.8989547038327527,
+      "recall": 0.6949793672627235,
+      "f1": 0.783915699647671
+    }
+  },
+  "action_counter": {
+    "CHALLENGE_LLM": 93,
+    "CHALLENGE_SLM": 158,
+    "KEEP_INTERSECTION": 566,
+    "KEEP_SLM": 12830,
+    "REJECT": 1424
+  },
+  "debate_design": {
+    "actions": [
+      {
+        "name": "KEEP_SLM",
+        "description": "接受智能体B(SLM)给出的关系。",
+        "effect": "将该关系直接加入最终集合。"
+      },
+      {
+        "name": "KEEP_INTERSECTION",
+        "description": "仅当A/B都给出同一关系时保留。",
+        "effect": "优先保留共识关系。"
+      },
+      {
+        "name": "CHALLENGE_LLM",
+        "description": "要求A解释为什么一个LLM-only关系值得加入。",
+        "effect": "若类型先验足够强，则把LLM-only关系作为召回补充。"
+      },
+      {
+        "name": "CHALLENGE_SLM",
+        "description": "要求B解释一个低置信度SLM关系。",
+        "effect": "若类型先验不足，则丢弃该关系，提升精确率。"
+      },
+      {
+        "name": "REJECT",
+        "description": "双方都无法给出足够证据时拒绝该关系。",
+        "effect": "不把关系加入最终结果。"
+      },
+      {
+        "name": "STOP",
+        "description": "当前实体对的辩论结束。",
+        "effect": "输出当前保留的关系集合。"
+      }
+    ],
+    "prompts": {
+      "agent_a": "你是智能体A，只能使用LLM候选集合C中的关系。请针对当前关系给出：1) 是否坚持；2) 依据的实体类型约束；3) 为什么它能补充SLM漏掉的召回。",
+      "agent_b": "你是智能体B，只能使用SLM候选集合D中的关系。请针对当前关系给出：1) 是否坚持；2) 与实体类型是否匹配；3) 为什么它比LLM更可靠。",
+      "selector": "你是策略选择器。观察当前状态(state)后，只能输出一个动作：KEEP_SLM / KEEP_INTERSECTION / CHALLENGE_LLM / CHALLENGE_SLM / REJECT / STOP。目标是在整个测试集上最大化F1。"
+    },
+    "reward": {
+      "true_positive": 1.0,
+      "false_positive": -1.0,
+      "false_negative_penalty": -0.35,
+      "early_consensus_bonus": 0.1,
+      "selector_objective": "maximize 2*TP / (|pred| + |gold|)"
+    }
+  }
+}
