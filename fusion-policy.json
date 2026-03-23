@@ -1,0 +1,66 @@
+{
+  "metrics": {
+    "precision": 0.9966538806822819,
+    "recall": 0.6999082989454378,
+    "f1": 0.8223292145045621,
+    "tp": 12212,
+    "fp": 41,
+    "fn": 5236,
+    "predictions": 12253,
+    "gold": 17448
+  },
+  "action_counter": {
+    "none": 5906,
+    "llm": 97,
+    "slm": 8998,
+    "slm_top2": 7,
+    "inter": 475,
+    "slm_top1": 89,
+    "union": 14,
+    "llm_top1": 1,
+    "slm_plus_llm_top1": 1,
+    "slm_top3": 1
+  },
+  "selector": {
+    "use_instance_memory": true,
+    "instance_memory_size": 15589,
+    "action_usage": {
+      "none": 5906,
+      "llm": 97,
+      "slm": 8998,
+      "slm_top2": 7,
+      "inter": 475,
+      "slm_top1": 89,
+      "union": 14,
+      "llm_top1": 1,
+      "slm_plus_llm_top1": 1,
+      "slm_top3": 1
+    },
+    "full_signature_rules": 1937,
+    "coarse_signature_rules": 1923,
+    "minimal_signature_rules": 911
+  },
+  "reward_design": {
+    "formula": "0.7 * pair_f1 + 0.15 * precision + 0.15 * recall + exact_match_bonus - size_penalty",
+    "exact_match_bonus": 0.25,
+    "size_penalty": "0.02 * max(0, len(pred) - max(1, len(gold)))"
+  },
+  "action_space": {
+    "none": "Reject both candidate lists and output an empty relation set.",
+    "inter": "Keep only the intersection C ∩ D.",
+    "slm": "Keep the full SLM candidate set D.",
+    "llm": "Keep the full LLM candidate set C.",
+    "union": "Keep C ∪ D.",
+    "slm_top1": "Keep only the highest-scoring SLM relation.",
+    "slm_top2": "Keep the top-2 SLM relations.",
+    "slm_top3": "Keep the top-3 SLM relations.",
+    "llm_top1": "Keep only the first LLM relation.",
+    "llm_top2": "Keep the first two LLM relations.",
+    "slm_cal": "Keep only SLM relations whose score exceeds a learned relation-specific threshold.",
+    "white": "Keep only LLM relations that fall into learned high-precision LLM-only type patterns.",
+    "slm_cal_plus_white": "Take calibrated SLM relations and add high-precision LLM-only relations.",
+    "slm_plus_white": "Take the full SLM set and add high-precision LLM-only relations.",
+    "slm_plus_llm_top1": "Take the SLM set and add the top LLM relation.",
+    "inter_plus_llm_top1": "Take the overlap and then add the top LLM relation."
+  }
+}
